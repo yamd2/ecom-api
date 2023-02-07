@@ -1,0 +1,15 @@
+// admin api
+
+@url = http://localhost:8000/api/v1
+
+POST  {{url}}/admin/register
+Content-Type: application/json
+
+{
+"address": "",
+"email": "sy@skdf.com",
+"fName": "asfasfs",
+"lName": "asdfasdfas",
+"password": "sadfgs",
+"phone": "09876543"
+}

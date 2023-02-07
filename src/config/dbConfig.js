@@ -7,7 +7,7 @@ export const dbConnect = async () => {
     const con = await mongoose.connect(process.env.MONGO_CLIENT);
     con?.connections
       ? console.log("DB connected")
-      : console.log("Unable to connect mongo");
+      : console.log("unable to connect mongo");
   } catch (error) {
     console.log(error);
   }
