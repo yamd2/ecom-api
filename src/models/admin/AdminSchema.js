@@ -4,22 +4,11 @@ const adminSchema = new mongoose.Schema(
   {
     status: {
       type: String,
-      default: "inactive ",
+      default: "inactive",
     },
     address: {
       type: String,
       default: "",
-    },
-    confirmPassword: {
-      type: String,
-      default: "",
-    },
-    emailVerificationCode: {
-      type: String,
-    },
-    isEmailVerified: {
-      type: Boolean,
-      default: false,
     },
 
     email: {
@@ -43,6 +32,13 @@ const adminSchema = new mongoose.Schema(
     phone: {
       type: String,
       default: "",
+    },
+    isEmailVerified: {
+      type: Boolean,
+      default: false,
+    },
+    emailVerificationCode: {
+      type: String,
     },
   },
   {

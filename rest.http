@@ -2,14 +2,28 @@
 
 @url = http://localhost:8000/api/v1
 
+
+# Create new admin user
 POST  {{url}}/admin/register
 Content-Type: application/json
 
 {
-"address": "",
-"email": "sy@skdf.com",
-"fName": "asfasfs",
+"address": "", 
+"email": "a@sdf.com",
+"fName":"asfasfs",
 "lName": "asdfasdfas",
-"password": "sadfgs",
-"phone": "09876543"
+"password": "afdasDF@#24",
+"phone": null
+}
+
+
+### login user
+POST  {{url}}/admin/login
+Content-Type: application/json
+
+{
+
+"email": "b@b.com",
+"password": "123456"
+
 }
