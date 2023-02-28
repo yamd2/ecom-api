@@ -3,6 +3,7 @@ import {
   emailVerificationValidation,
   loginValidation,
   newAdminValidation,
+  passResetValidation,
 } from "../middlewares/joiMiddleware.js";
 import {
   createNewAdmin,
@@ -13,9 +14,16 @@ import { comparePassword, hashPassword } from "../utils/bcrypt.js";
 const router = express.Router();
 import { v4 as uuidv4 } from "uuid";
 import {
+  emailOtp,
   emailVerifiedNotification,
   newAccountEmailVerificationEmail,
+  passwordUpdateNotification,
 } from "../utils/nodemailer.js";
+import { numString } from "../utils/randomGenerator.js";
+import {
+  createNewSession,
+  deleteSession,
+} from "../models/session/SessionModel.js";
 
 //admin user loging
 router.post("/login", loginValidation, async (req, res, next) => {
@@ -115,6 +123,85 @@ router.post("/verify", emailVerificationValidation, async (req, res, next) => {
     res.json({
       status: "error",
       message: "The link is invalid or expired.",
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// otp request
+router.post("/request-otp", async (req, res, next) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.json({
+        status: "error",
+        message: "Invalid request",
+      });
+    }
+
+    const user = await findUser({ email });
+
+    if (user?._id) {
+      //create otp,
+      const token = numString(6);
+      const obj = {
+        token,
+        associate: email,
+      };
+      //store opt and emial in new tabale called sessions
+      const result = await createNewSession(obj);
+
+      if (result?._id) {
+        //send that otp to their email
+        emailOtp({ email, token });
+
+        return res.json({
+          status: "success",
+          message:
+            "We have sent you an OTP to your email, chek your email and fill up the form below.",
+        });
+      }
+    }
+
+    res.json({
+      status: "error",
+      message: "Wrong email",
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// password reset request
+router.patch("/reset-password", passResetValidation, async (req, res, next) => {
+  try {
+    const { email, opt, password } = req.body;
+
+    const deletedToke = await deleteSession({ email, opt });
+
+    if (deletedToke?._id) {
+      //encrypt password and/update user password
+      const user = await updateAdmin(
+        { email },
+        { password: hashPassword(password) }
+      );
+
+      if (user?._id) {
+        //send email notification
+        passwordUpdateNotification(user);
+
+        return res.json({
+          status: "success",
+          message: "You password has been updated successfully",
+        });
+      }
+    }
+
+    res.json({
+      status: "error",
+      message: "Unable to update your password. Invalid or expired token",
     });
   } catch (error) {
     next(error);
